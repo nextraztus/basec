@@ -1,27 +1,64 @@
-#Configure Compiler
-CC=clang
-CFLAGS=-std=c99 -Iinc
-LDFLAGS=
-EXECUTABLE=basec
+# compiler configuration
+CC         ?= clang
+NASM       ?= nasm
+LDFLAGS    ?=
+CFLAGS     ?= -std=c11 -Iinc
+NASMFLAGS  ?= -f elf64 -g -F stabs
+BUILDDIR   ?= build
+SRCDIR     ?= src
+EXECUTABLE ?= $(BUILDDIR)/basec
 
-#configure build options
-BUILD_DIR := build
-SRCS := src/basec.c
+# release mode settings
+CFLAGS_RELEASE := -O2 \
+    -march=native     \
+    -mtune=native     \
+    -ftree-vectorize
 
-OBJS := ${SRCS:%.c=${BUILD_DIR}/%.o}
+# debug mode settings
+CFLAGS_DEBUG   := -g3 \
+    -O0               \
+    -DDEBUG
 
-all: $(SRCS) $(EXECUTABLE)
+# define our objects based on the source files we've got
+CSRCS := $(wildcard ${SRCDIR}/*.c)
+ASRCS := $(wildcard ${SRCDIR}/*.asm)
+COBJS := ${CSRCS:%.c=${BUILDDIR}/%.o}
+AOBJS := ${ASRCS:%.asm=${BUILDDIR}/%.o}
 
-${EXECUTABLE}: ${OBJS}
+# we default to debug builds
+all: debug
+
+# debug build
+.PHONY: debug
+debug: CFLAGS += $(CFLAGS_DEBUG)
+debug: $(EXECUTABLE)
+
+# release build
+.PHONY: release
+release: CFLAGS += $(CFLAGS_RELEASE)
+release: $(EXECUTABLE)
+
+# our executable relies on all the object files
+${EXECUTABLE}: ${COBJS} ${AOBJS}
 	@echo Linking $@ using $?
-	@$(CC) $(LDFLAGS) $(OBJS) -o $@
+	@$(CC) $(LDFLAGS) $(COBJS) $(AOBJS) -o $@
 
-${BUILD_DIR}/%.o: %.c
+${BUILDDIR}/%.o: %.c
 	@mkdir -p $(dir $@)
 	@echo Compiling $< ...
-	@$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
-${SRCS}:
+${BUILDDIR}/%.o: %.asm
+	@mkdir -p $(dir $@)
+	@echo Assembling $< ...
+	@$(NASM) $(NASMFLAGS) $< -o $@
+
+${CSRCS}:
+	@echo Creating $@
+	@mkdir -p $(dir $@)
+	@touch $@
+
+${ASRCS}:
 	@echo Creating $@
 	@mkdir -p $(dir $@)
 	@touch $@
@@ -29,5 +66,5 @@ ${SRCS}:
 .PHONY: clean
 clean:
 	rm -f ${EXECUTABLE}
-	rm -f ${OBJS}
+	rm -f ${COBJS} ${AOBJS}
 
