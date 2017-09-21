@@ -1,12 +1,10 @@
 /**
  * vim: set expandtab tabstop=4 shiftwidth=4 autoindent smartindent:
  *
- * <<<< FILE DESC >>>>
+ * Example test file for basec.
  *
  */
+#pragma once
 
-#ifndef _SP_PREFIX_H_
-#define _SP_PREFIX_H_ 
-
-#endif
+#include <stdio.h>
 
