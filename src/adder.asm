@@ -1,6 +1,6 @@
 ; vim: set expandtab tabstop=4 shiftwidth=4 autoindent smartindent:
 ;
-; module.asm -- example module
+; adder.asm -- example module
 ;
 
 ;;;;;;;;;;;;;;;;;;;; Initialized Data
