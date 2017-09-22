@@ -1,33 +1,29 @@
 ; vim: set expandtab tabstop=4 shiftwidth=4 autoindent smartindent:
 ;
-; test.asm -- example entrypoint
+; entrypoint.asm -- example entrypoint
 ;
 
 ;;;;;;;;;;;;;;;;;;;; Initialized Data
 SECTION .data
-
-msgtoprint: db "One small step below C, one giant leap for Sam.",10
-msglen:     equ $-msgtoprint
+    msg:        db "Goodbye, universe!"
+    msglen:     equ $-msg
 
 ;;;;;;;;;;;;;;;;;;;; Uninitialized Data
 SECTION .bss
 
 ;;;;;;;;;;;;;;;;;;;; Executable Code
 SECTION .text
+    global main
 
-global _start
+main:                       ; Entry Point
+    mov rax, 1              ; sys_write syscall
+    mov rdi, 1              ; use stdout (fd 1)
+    mov rsi, msg            ; offset of message
+    mov rdx, msglen         ; length of message
+    syscall
 
-_start:                     ; Entry Point
-    nop                     ; give our debugger something to work with
-
-    mov eax,4               ; sys_write syscall
-    mov ebx,1               ; use stdout (FD 1)
-    mov ecx,msgtoprint      ; offset of message
-    mov edx,msglen          ; length of message
-    int 80H                 ; invoke syscall (sys_write message)
-
-    mov eax,1               ; exit syscall
-    mov ebx,0               ; return code 0
-    int 80H                 ; invoke syscall (terminate program)
+    mov rax, 60             ; sys_exit syscall
+    mov rdi, 0              ; return code 0
+    syscall                 ; terminate
 
 
