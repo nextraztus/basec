@@ -20,7 +20,7 @@ ENV LANG en_US.utf8
 WORKDIR /compile
 
 # setup entrypoint
-COPY docker/entrypoint.sh /
+COPY dockercompiler/entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 
 # install any c libraries we need

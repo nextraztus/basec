@@ -14,7 +14,7 @@ tools such as CMake and Automake. This layout has worked well for my needs, mayb
 | `/ref` | reference files, such as a blank.h and blank.c |
 | `/inc` | project-specific include files, added to include path in Makefile |
 | `/src` | C source-code for the project |
-| `/docker` | support files for using a docker workflow for building your application |
+| `/dockercompiler` | support files for using a docker workflow for building your application |
 
 ## Building Application
 
@@ -25,12 +25,12 @@ tools such as CMake and Automake. This layout has worked well for my needs, mayb
 1. `make`
 
 ### With docker
-1. update `Dockerfile` to apt-get any libraries you need (use the block near the bottom of the file to keep rebuild
-times lower)
+1. update `./dockercompiler/Dockerfile` to apt-get any libraries you need (use the block near the bottom of the file to
+keep rebuild times lower)
 1. use `./make_with_docker.sh` to pass any arguments through to make
 
-The docker-build method will mount the source directory with the code and build it within a temporary container. The
-output binaries should show up in build & have the appropriate permissions for the user that ran docker to move them around.
+The docker-based build method will mount the source directory with the code and compile within a temporary container. The
+output binaries should show up in `./build` & have the same uid/gid as the user who initiated the build.
 
 ## Build Documentation
 
