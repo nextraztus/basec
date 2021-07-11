@@ -14,6 +14,8 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 SPORT=${PORT:-8000}
 COMPILEIMAGE="mkdocsrenderer:latest"
 
+cd "$DIR"
+
 # do the right thing if we have a TTY
 if [ -t 1 ]
 then
@@ -22,24 +24,23 @@ else
     TTYARGS=""
 fi
 
+SITEUID=$(id -u)
+SITEGID=$(id -g)
+
 container_run() {
-    docker build -t $COMPILEIMAGE -f Dockerfile . || exit 1
-    docker run --rm=true                   \
-               -v $(pwd):/app              \
-               -p $SPORT:8000              \
-               -e SITEUID=$(id -u)         \
-               -e SITEGID=$(id -g)         \
-               $TTYARGS                    \
+    sudo docker build -t $COMPILEIMAGE -f Dockerfile . || exit 1
+    sudo docker run --rm=true \
+               -v $(pwd):/app \
+               -p 127.0.0.1:$SPORT:8000 \
+               -e SITEUID \
+               -e SITEGID \
+               $TTYARGS \
                $COMPILEIMAGE $1
 }
 
 case "$1" in
         serve)
             container_run serve
-            ;;
-
-        run)
-            container_run run
             ;;
 
         build)
@@ -49,9 +50,6 @@ case "$1" in
         *)
             echo "Usage: $0 {serve|run|build}"
             echo " serve -- servce the static site on port $PORT"
-            echo "   run -- drop into a shell within the temporary container for debugging"
             echo " build -- compiles the site and dumps to /site"
             exit 1
 esac
-
-# vim: set expandtab tabstop=4 shiftwidth=4 autoindent smartindent:

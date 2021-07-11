@@ -68,3 +68,6 @@ clean:
 	rm -f ${EXECUTABLE}
 	rm -f ${COBJS} ${AOBJS}
 
+.PHONY: docs
+docs:
+	./docs/render.sh build

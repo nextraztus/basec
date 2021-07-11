@@ -1,8 +1,16 @@
 #!/bin/bash
 set -e
 
-addgroup -g $SITEGID -S sitecontent
-adduser  -u $SITEUID -S sitecontent
+id -u builder 2>/dev/null || {
+    BUILDUID=${BUILDUID:-0}
+    BUILDGID=${BUILDGID:-0}
+
+    if [ "$BUILDUID" -ne "0" ]
+    then
+        groupadd -g $BUILDGID builder
+        useradd -ms /bin/bash -u $BUILDUID -g $BUILDGID builder
+    fi
+}
 
 case "$1" in
      build)
@@ -13,10 +21,6 @@ case "$1" in
         mkdocs serve -a 0.0.0.0:8000
         ;;
 
-       run)
-        exec sh
-        ;;
-
         *)
         echo "Acceptable commands: build, serve, run (drops into a shell)"
         ;;
@@ -24,4 +28,3 @@ esac
 
 chown $SITEUID:$SITEGID -R /app/site
 
-# vim: set expandtab tabstop=4 shiftwidth=4 autoindent smartindent:
